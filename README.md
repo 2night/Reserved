@@ -4,8 +4,8 @@ A scgi client for D programming language.
 # The simple way
 
 ```d
-import std.stdio;
 import reserved;
+import std.stdio;
 
 @ReservedResponse
 private void response(Request req, Output output)
@@ -36,6 +36,20 @@ location / {
 ```
 
 Pay attention to sock file permission. Both your application and nginx must have permission to read/write that file. The easy way is to run both with the same user.
+
+# Init function
+
+If you need to call a one-time-init function, you can annotate it with ```@ReservedInit```.
+Its signature must be one of these:
+
+```d
+bool init()
+
+// will be called using main() args
+bool init(string[] args)
+```
+
+It musts return true on success.
 
 # Multiple responder
 
