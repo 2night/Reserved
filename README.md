@@ -43,6 +43,8 @@ location / {
 
 Pay attention to sock file permission. Both your application and nginx must have permission to read/write that file. The easy way is to run both with the same user.
 
+Once the server is running, just browse to http://localhost/?name=D
+
 # Init function
 
 If you need to call a one-time-init function, you can annotate it with ```@ReservedInit```.
