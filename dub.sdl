@@ -1,0 +1,6 @@
+name "reserved"
+description "A minimal library to run your D application on your webserver using scgi"
+authors "Andrea Fontana"
+copyright "Copyright © 2017-2018, 2night.it"
+license "MIT"
+targetType "sourceLibrary"
