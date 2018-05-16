@@ -1,5 +1,5 @@
 # Reserved
-A scgi client for D programming language.
+A [scgi](https://en.wikipedia.org/wiki/Simple_Common_Gateway_Interface) client for D programming language. Doc: [dpldocs]( http://reserved.dpldocs.info)
 
 # The simple way
 
@@ -51,7 +51,7 @@ bool init(string[] args)
 
 It musts return true on success.
 
-# Multiple responder
+# Multiple responders
 
 If you want to run multiple parallel responders, just use ```-i``` options on command line. For example ```./your_app -i 3``` will create a socket named ```/tmp/run/awesome_d_webservice/listener.3.sock``` and/or will kill any process running on it.
 
