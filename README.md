@@ -4,6 +4,12 @@ A [scgi](https://en.wikipedia.org/wiki/Simple_Common_Gateway_Interface) client f
 # The simple way
 
 ```d
+#!/usr/bin/env dub
+/+ dub.sdl:
+        name "awesome_d_webservice"
+        dependency "reserved" version="1.0.0"
++/
+
 import reserved;
 import std.stdio;
 
