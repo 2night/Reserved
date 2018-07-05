@@ -43,7 +43,7 @@ template Reserved(string serviceName)
    extern(C)
    void exit_gracefully(int value)
    {
-      import std.c.stdlib : exit;
+      import core.stdc.stdlib : exit;
       lock.lock();
       exit(0);
    }
