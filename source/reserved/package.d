@@ -486,7 +486,7 @@ class Output
                c.expire.hour, c.expire.minute, c.expire.second
             );
 
-            _socket.send(format("; Expires: %s", data));
+            _socket.send(format("; Expires=%s", data));
          }
 
          if (!c.path.length == 0) _socket.send(format("; path=%s", c.path));
