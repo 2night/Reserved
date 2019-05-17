@@ -26,7 +26,17 @@ private import std.exception;
 private import std.socket;
 
 // Used to track exit requested by SIGTERM o SIGINT
-public __gshared bool _exitRequested = false;
+private __gshared bool _exitRequested = false;
+private __gshared bool _isRequestRunning = false;
+
+public void reservedExit(bool force = false) {  
+   import core.stdc.stdlib : exit;
+   if (force || _exitRequested) exit(0);
+   _exitRequested = true;
+}
+
+public bool isReservedExiting() { return _exitRequested; }
+public bool isReservedRunning() { return _isRequestRunning; }
 
 /// UDA. Annotate a function ```bool your_function()``` or ```bool your_function(string[] args)``` to execute it once before the first request.
 public enum ReservedInit;
@@ -40,13 +50,10 @@ public enum ReservedResponse;
  */
 template Reserved(string serviceName)
 {
+   
    // This will catch term signals
    extern(C)
-   void exit_gracefully(int value)
-   {
-      import core.stdc.stdlib : exit;
-      if (_exitRequested) exit(0); else _exitRequested = true;
-   }
+   void exit_gracefully(int value) { reservedExit(isReservedExiting() || !isReservedRunning()); }
 
    int main(string[] args)
    {
@@ -179,6 +186,9 @@ void __reservedImpl(string serviceName, H)(H handler, string socketFile)
 
    while(true)
    {
+      _isRequestRunning = true;
+      scope(exit) _isRequestRunning = false;
+
       requestCount++;
       requestData.length = 0;
 
