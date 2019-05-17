@@ -25,7 +25,8 @@ private import core.sync.mutex   : Mutex;
 private import std.exception;
 private import std.socket;
 
-__gshared Mutex lock;
+// Used to track exit requested by SIGTERM o SIGINT
+public __gshared bool _exitRequested = false;
 
 /// UDA. Annotate a function ```bool your_function()``` or ```bool your_function(string[] args)``` to execute it once before the first request.
 public enum ReservedInit;
@@ -44,8 +45,7 @@ template Reserved(string serviceName)
    void exit_gracefully(int value)
    {
       import core.stdc.stdlib : exit;
-      lock.lock();
-      exit(0);
+      if (_exitRequested) exit(0); else _exitRequested = true;
    }
 
    int main(string[] args)
@@ -55,7 +55,6 @@ template Reserved(string serviceName)
       import core.sync.mutex;
       import std.traits : hasUDA, ReturnType;
       import std.file : mkdirRecurse, write, readText, exists, remove;
-      
       ulong listenerId = 0;
 
       // Command line parsing
@@ -74,8 +73,6 @@ template Reserved(string serviceName)
             return 0;
          }
       }
-
-      synchronized { lock = new Mutex(); }
 
       // Catching signal
       sigset(SIGINT, &exit_gracefully);
@@ -178,8 +175,11 @@ void __reservedImpl(string serviceName, H)(H handler, string socketFile)
    char[] requestData;
    requestData.reserve = 4096*10;
 
+   size_t requestCount = 0;
+
    while(true)
    {
+      requestCount++;
       requestData.length = 0;
 
       string[string] headers;
@@ -188,10 +188,6 @@ void __reservedImpl(string serviceName, H)(H handler, string socketFile)
 
       // We accept request from webserver            
       receiver = listener.accept();
-
-      // We use lock to prevent shutting down during operation
-      lock.lock();
-
             
       while(!requestCompleted)
       {
@@ -251,10 +247,12 @@ void __reservedImpl(string serviceName, H)(H handler, string socketFile)
       if (!requestCompleted)
       {
          // TODO: Bad request;
-         lock.unlock();
          receiver.close();
          continue;
       }
+
+      // Add a custom headers with some meta
+      headers["X_RESERVED_REQUESTS"] = requestCount.to!string;
 
       // Start request
       Request request = new Request(headers, requestData);
@@ -285,11 +283,9 @@ void __reservedImpl(string serviceName, H)(H handler, string socketFile)
       finally 
       { 
          receiver.close();
-      }
-      
-      lock.unlock();
+      } 
 
-      if(exit == true) break;
+      if(exit == true || _exitRequested == true) break;
    }
 }
 
