@@ -171,7 +171,7 @@ void __reservedImpl(string serviceName, H)(H handler, string socketFile)
    Socket listener = new Socket(AddressFamily.UNIX, SocketType.STREAM);
    listener.blocking = true;
    listener.bind(address);
-   listener.listen(3);
+   listener.listen(128);
 
    reservedLog("Ok, ready. Socket:", socketFile);
 
@@ -289,6 +289,7 @@ void __reservedImpl(string serviceName, H)(H handler, string socketFile)
           
           reservedLog(format("Throwable: %s", t.msg)); 
           exit = true;
+          reservedExit(true);
       }
       finally 
       { 
