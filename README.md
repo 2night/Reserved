@@ -7,7 +7,7 @@ A [scgi](https://en.wikipedia.org/wiki/Simple_Common_Gateway_Interface) client f
 #!/usr/bin/env dub
 /+ dub.sdl:
         name "awesome_d_webservice"
-        dependency "reserved" version="1.0.0"
+        dependency "reserved" version="1.0.5"
 +/
 
 import reserved;
