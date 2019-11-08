@@ -89,7 +89,7 @@ template Reserved(string serviceName)
       auto getReservedFunction(alias T)()
       {
          foreach(name;  __traits(allMembers,  __traits(parent, main)))
-            static if (hasUDA!(__traits(getMember, __traits(parent, main), name), T))
+            static if (name != "main" /* issue 20368 with dmd 2.089.0 */ && hasUDA!(__traits(getMember, __traits(parent, main), name), T))
                return &__traits(getMember, __traits(parent, main), name);
       }
 
